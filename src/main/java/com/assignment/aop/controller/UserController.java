@@ -9,34 +9,32 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-/** REST controller responsible for handling user-related operations.
-
- * This controller exposes endpoints for creating new users.
- * It delegates business logic to {@link UserAddService}.
-
- * Base URL: /user
+/**
+ * REST controller responsible for handling user-related operations.
  *
-  * @author Ansh Parnami
+ * <p>This controller exposes endpoints for creating new users. It delegates business logic to
+ * {@link UserAddService}.
+ *
+ * <p>Base URL: /user
+ *
+ * @author Ansh Parnami
  * @since 2026-02-26
  */
 @RestController
 @RequestMapping("/user")
 public class UserController {
 
-    @Autowired
-    UserAddService userAddService;
+  @Autowired UserAddService userAddService;
 
-
-    /**
-     * Creates a new user.
-     * This endpoint accepts a {@link UserAddRequest} object in the request body
-     * and returns a {@link UserAddResponse} containing the result of the operation.
-     * @param userAddRequest the request object containing user details to be created
-     * @return UserAddResponse containing the created user information or status details
-     */
-    @PostMapping
-    public UserAddResponse addUser(@RequestBody UserAddRequest userAddRequest){
-        return userAddService.addUser(userAddRequest);
-    }
-
+  /**
+   * Creates a new user. This endpoint accepts a {@link UserAddRequest} object in the request body
+   * and returns a {@link UserAddResponse} containing the result of the operation.
+   *
+   * @param userAddRequest the request object containing user details to be created
+   * @return UserAddResponse containing the created user information or status details
+   */
+  @PostMapping
+  public UserAddResponse addUser(@RequestBody UserAddRequest userAddRequest) {
+    return userAddService.addUser(userAddRequest);
+  }
 }

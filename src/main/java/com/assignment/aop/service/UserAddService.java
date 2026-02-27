@@ -1,19 +1,18 @@
 package com.assignment.aop.service;
 
-import com.assignment.aop.model.UserEntity;
 import com.assignment.aop.model.UserAddRequest;
 import com.assignment.aop.model.UserAddResponse;
+import com.assignment.aop.model.UserEntity;
 import com.assignment.aop.repository.UserRepository;
-import org.aspectj.lang.annotation.AfterReturning;
+import java.time.LocalDateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.time.LocalDateTime;
 
 /**
  * Service class responsible for managing user creation logic.
  * This class handles the transformation of incoming request DTOs into
  * persistent JPA entities for SQL Server storage.
+ *
  * @author Ansh Parnami
  * @since 2026-02-26
  */
@@ -42,8 +41,9 @@ public class UserAddService {
         // Persist to SQL Server (MongoSyncAspect triggers after this)
         UserEntity savedUser = userRepository.save(u);
 
-        UserAddResponse userAddResponse = new UserAddResponse(savedUser.getId(), savedUser.getUsername(), savedUser.getEmail());
-
+        UserAddResponse userAddResponse;
+        userAddResponse = new UserAddResponse(savedUser.getId(),
+                savedUser.getUsername(), savedUser.getEmail());
 
         return userAddResponse;
     }

@@ -1,5 +1,9 @@
 package com.assignment.aop;
 
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
+
 import com.assignment.aop.adapter.DataSyncAdapter;
 import com.assignment.aop.adapter.UserToMongoAdapter;
 import com.assignment.aop.aspect.MongoSyncAspect;
@@ -11,7 +15,8 @@ import com.assignment.aop.model.UserEntity;
 import com.assignment.aop.repository.UserMongoRepository;
 import com.assignment.aop.repository.UserRepository;
 import com.assignment.aop.service.UserAddService;
-
+import java.time.LocalDateTime;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -19,13 +24,6 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-
-import java.time.LocalDateTime;
-import java.util.stream.Stream;
-
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
 
 /**
  * Unit Test suite for the AOP Application.
@@ -75,13 +73,13 @@ class AopApplicationTests {
 				.createdAt(LocalDateTime.now())
 				.build();
 
-		UserDoc resultDoc = adapter.Sync(mockSqlEntity);
+		UserDoc resultDoc = adapter.sync(mockSqlEntity);
 
 		assertNotNull(resultDoc, "The translated document should not be null.");
 		assertEquals("99", resultDoc.getMongoId(), "SQL ID should be converted to String.");
 		assertEquals("adapter_user", resultDoc.getUserName(), "Username should be mapped correctly.");
 		assertEquals("adapter@test.com", resultDoc.getEmail(), "Email should be mapped correctly.");
-		assertNotNull(resultDoc.getSyncTimestamp(), "A sync timestamp must be generated.");
+		assertNotNull(resultDoc.getSyncTimestamp(), "A Sync timestamp must be generated.");
 	}
 
 	/**
@@ -98,7 +96,7 @@ class AopApplicationTests {
 				.email(null)
 				.build();
 
-		UserDoc resultDoc = adapter.Sync(entityWithNulls);
+		UserDoc resultDoc = adapter.sync(entityWithNulls);
 
 		assertNotNull(resultDoc, "Doc should not be null even if entity fields are null.");
 		assertEquals("1", resultDoc.getMongoId(), "ID should still be mapped.");
@@ -115,11 +113,11 @@ class AopApplicationTests {
 		UserToMongoAdapter adapter = new UserToMongoAdapter();
 
 		UserEntity zeroIdEntity = UserEntity.builder().id(0L).username("zero user").build();
-		UserDoc zeroDoc = adapter.Sync(zeroIdEntity);
+		UserDoc zeroDoc = adapter.sync(zeroIdEntity);
 		assertEquals("0", zeroDoc.getMongoId(), "ID of 0 should convert to string '0'.");
 
 		UserEntity negativeIdEntity = UserEntity.builder().id(-5L).username("- user").build();
-		UserDoc negDoc = adapter.Sync(negativeIdEntity);
+		UserDoc negDoc = adapter.sync(negativeIdEntity);
 		assertEquals("-5", negDoc.getMongoId(), "Negative ID should convert to string '-5'.");
 	}
 
@@ -132,7 +130,7 @@ class AopApplicationTests {
 	void adapterUnitTest_Parameterized(UserEntity entity) {
 		UserToMongoAdapter adapter = new UserToMongoAdapter();
 
-		UserDoc doc = adapter.Sync(entity);
+		UserDoc doc = adapter.sync(entity);
 
 		assertNotNull(doc);
 		assertEquals(String.valueOf(entity.getId()), doc.getMongoId());
@@ -258,11 +256,11 @@ class AopApplicationTests {
 		UserDoc fakeDoc = new UserDoc();
 		fakeDoc.setMongoId("5");
 
-		when(mockAdapter.Sync(any(UserEntity.class))).thenReturn(fakeDoc);
+		when(mockAdapter.sync(any(UserEntity.class))).thenReturn(fakeDoc);
 
 		mongoSyncAspect.afterUserSave(fakeEntity);
 
-		verify(mockAdapter, times(1)).Sync(fakeEntity);
+		verify(mockAdapter, times(1)).sync(fakeEntity);
 		verify(userMongoRepository, times(1)).save(fakeDoc);
 	}
 
@@ -299,14 +297,14 @@ class AopApplicationTests {
 		fakeEntity.setId(7L);
 		fakeEntity.setUsername("error_user");
 
-		when(mockAdapter.Sync(any(UserEntity.class)))
+		when(mockAdapter.sync(any(UserEntity.class)))
 				.thenThrow(new RuntimeException("Adapter failure"));
 
 		assertThrows(RuntimeException.class,
 				() -> mongoSyncAspect.afterUserSave(fakeEntity),
 				"Exception from adapter should propagate out of the aspect.");
 
-		verify(mockAdapter, times(1)).Sync(fakeEntity);
+		verify(mockAdapter, times(1)).sync(fakeEntity);
 		verifyNoInteractions(userMongoRepository);
 	}
 
@@ -324,7 +322,7 @@ class AopApplicationTests {
 		specificDoc.setMongoId("8");
 		specificDoc.setUserName("exact_doc_user");
 
-		when(mockAdapter.Sync(fakeEntity)).thenReturn(specificDoc);
+		when(mockAdapter.sync(fakeEntity)).thenReturn(specificDoc);
 
 		mongoSyncAspect.afterUserSave(fakeEntity);
 
