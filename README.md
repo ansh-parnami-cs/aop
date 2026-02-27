@@ -1,6 +1,6 @@
 # Dual-Write Data Synchronization via Spring AOP
 
-## 📌 Project Overview
+##  Project Overview
 This microservice demonstrates a robust dual-write database strategy using **Aspect-Oriented Programming (AOP)**. 
 
 The primary goal of this application is to serve as a User Management system where primary transactional data is saved to a relational SQL database. Upon a successful transaction, a Spring AOP Aspect transparently intercepts the operation, adapts the data model, and asynchronously archives the record into a NoSQL MongoDB Atlas cluster for analytical purposes.
@@ -19,17 +19,17 @@ This application follows a strict Separation of Concerns, utilizing the **MVC** 
 
 ## Technologies Used
 * **Java 17+**
-* **Spring Boot** (Web, Data JPA, Data MongoDB, AOP)
+* **Spring Boot**
 * **Databases:** Relational SQL (MySQL/SQL Server) & MongoDB Atlas
 * **Lombok:** Boilerplate reduction (Builders, Data, Constructors)
-* **Testing:** JUnit 5, Mockito (Pure unit testing without Spring Context)
+* **Testing:** JUnit 5, Mockito 
 
 ## Project Structure
 ```text
 src/main/java/com/assignment/aop/
 ├── adapter/          # Contains DataSyncAdapter and UserToMongoAdapter
-├── aspect/           # Contains MongoSyncAspect (The Interceptor)
-├── controller/       # Contains UserController (REST Endpoints)
+├── aspect/           # Contains MongoSyncAspect 
+├── controller/       # Contains UserController 
 ├── model/            # Contains Entities (SQL), Docs (Mongo), and DTOs
 ├── repository/       # Contains JpaRepository and MongoRepository interfaces
 └── service/          # Contains UserAddService (Business logic)
